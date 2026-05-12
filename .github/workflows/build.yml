@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pywebview==5.3.4 pyinstaller pythonnet clr-loader
+          pip install pywebview pyinstaller
 
       - name: Build EXE
         run: |
