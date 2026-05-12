@@ -32,14 +32,22 @@ jobs:
           path: dist/HermesAgent.exe
 
       - name: Create Release
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: "Hermes Agent v${{ github.run_number }}"
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Hermes Agent v1.0.${{ github.run_number }}"
           files: dist/HermesAgent.exe
           body: |
-            自动构建版本。下载 HermesAgent.exe 直接运行即可。
+            🚀 自动构建版本
 
-            **使用前提：** 已安装 Hermes Agent 并运行过 `hermes setup`
+            ## 下载和使用
+            1. 下载 `HermesAgent.exe`
+            2. 双击运行即可
+
+            **前提条件:** 需要先安装 Hermes Agent 并运行 `hermes setup`
+
+            ---
+            构建时间: ${{ github.event.head_commit.timestamp }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
