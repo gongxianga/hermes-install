@@ -1,0 +1,45 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pywebview==5.3.4 pyinstaller
+
+      - name: Build EXE
+        run: |
+          pyinstaller --onefile --windowed --name "HermesAgent" hermes_app.py
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HermesAgent-windows
+          path: dist/HermesAgent.exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "Hermes Agent v${{ github.run_number }}"
+          files: dist/HermesAgent.exe
+          body: |
+            自动构建版本。下载 HermesAgent.exe 直接运行即可。
+
+            **使用前提：** 已安装 Hermes Agent 并运行过 `hermes setup`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
