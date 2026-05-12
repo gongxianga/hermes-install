@@ -154,13 +154,32 @@ $installBtn.Add_Click({
 
         & $scriptBlock -InstallDir $installPath -HermesHome $dataPath -SkipSetup
 
+        $progressBar.Value = 70
+        Write-Log ">>> 正在创建启动器..."
+
+        # 下载启动器脚本到安装目录
+        $launcherUrl = "https://raw.githubusercontent.com/gongxianga/hermes-install/main/launch-hermes.ps1"
+        $launcherPath = "$installPath\launch-hermes.ps1"
+        Invoke-WebRequest -Uri $launcherUrl -OutFile $launcherPath
+
+        # 在桌面创建快捷方式
+        $desktopPath = [System.Environment]::GetFolderPath("Desktop")
+        $shortcutPath = "$desktopPath\Hermes Agent.lnk"
+        $shell = New-Object -ComObject WScript.Shell
+        $shortcut = $shell.CreateShortcut($shortcutPath)
+        $shortcut.TargetPath = "powershell.exe"
+        $shortcut.Arguments = "-NoExit -ExecutionPolicy Bypass -File `"$launcherPath`""
+        $shortcut.WorkingDirectory = $installPath
+        $shortcut.Description = "启动 Hermes Agent"
+        $shortcut.Save()
+
         $progressBar.Value = 90
+        Write-Log ">>> 桌面快捷方式已创建！" "Cyan"
         Write-Log ">>> 安装完成！" "Cyan"
-        Write-Log ">>> 请打开新的 PowerShell 窗口运行: hermes setup" "Yellow"
         $progressBar.Value = 100
 
         [System.Windows.Forms.MessageBox]::Show(
-            "安装成功！`n`n请打开新的 PowerShell 窗口，运行以下命令完成配置：`n`n  hermes setup",
+            "安装成功！`n`n桌面已创建「Hermes Agent」快捷方式，双击即可启动。`n`n首次运行请在 PowerShell 中执行：`n  hermes setup",
             "安装完成",
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Information
